@@ -1,2 +1,5 @@
 @import 'bootstrap/scss/bootstrap';
+@import './global/fonts.scss';
+@import '../scss/components/header.scss';
 
+@import '../scss/pages/tasks.scss'
