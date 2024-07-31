@@ -12,7 +12,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return view('task.index', ['tasks' => Task::all()]);
+        return view('tasks', ['tasks' => Task::all()]);
     }
 
     /**
@@ -27,7 +27,7 @@ class TaskController extends Controller
 
         Task::create($validated);
 
-        return redirect()->route('tasks.index');
+        return redirect()->route('tasks');
     }
 
     /**
@@ -53,7 +53,7 @@ class TaskController extends Controller
 
         $task->update($validated);
 
-        return redirect()->route('tasks.index');
+        return redirect()->route('tasks');
     }
 
     /**
@@ -63,6 +63,6 @@ class TaskController extends Controller
     {
         Task::destroy($id);
 
-        return redirect()->route('tasks.index');
+        return redirect()->route('tasks');
     }
 }
