@@ -2,32 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use Illuminate\Http\Request;
+use App\Services\TaskHandlerService;
+use App\Http\Requests\TaskRequest;
+use App\Traits\HandlerRequest;
 
 class TaskController extends Controller
 {
+    use HandlerRequest;
+
+    protected $taskHandlerService;
+
+    public function __construct(TaskHandlerService $taskHandlerService)
+    {
+        $this->taskHandlerService = $taskHandlerService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('tasks', ['tasks' => Task::all()]);
+        return $this->handleRequest(function () {
+            return $this->taskHandlerService->renderTaskList(request());
+        }, "Erro ao recuperar os dados");
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        Task::create($validated);
-
-        return redirect()->route('tasks');
+        $data = $request->validated();
+        return $this->handleRequest(function () use ($data) {
+            return $this->taskHandlerService->createTaskAndRedirect($data);
+        }, "Erro ao criar a Task");
     }
 
     /**
@@ -35,25 +43,20 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-        $task = Task::findOrFail($id);
-        return view('task.show', compact('task'));
+        return $this->handleRequest(function () use ($id) {
+            return $this->taskHandlerService->renderTaskDetails($id);
+        }, "Erro ao recuperar a Task");
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(TaskRequest $request, string $id)
     {
-        $task = Task::findOrFail($id);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $task->update($validated);
-
-        return redirect()->route('tasks');
+        $data = $request->validated();
+        return $this->handleRequest(function () use ($data, $id) {
+            return $this->taskHandlerService->updateTaskAndRedirect($id, $data);
+        }, "Erro ao atualizar a Task");
     }
 
     /**
@@ -61,8 +64,8 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        Task::destroy($id);
-
-        return redirect()->route('tasks');
+        return $this->handleRequest(function () use ($id) {
+            return $this->taskHandlerService->deleteTaskAndRedirect($id);
+        }, "Erro ao deletar a tarefa");
     }
 }
