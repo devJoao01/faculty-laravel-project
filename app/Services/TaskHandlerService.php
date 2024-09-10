@@ -2,8 +2,13 @@
 
 namespace App\Services;
 
-use App\Http\Resources\TaskResource;
 use Illuminate\Http\Request;
+
+
+namespace App\Services;
+
+use Illuminate\Http\Request;
+use App\Services\TaskService;
 
 class TaskHandlerService
 {
@@ -17,14 +22,13 @@ class TaskHandlerService
     public function renderTaskList(Request $request)
     {
         $tasks = $this->taskService->all();
-        $formattedTasks = TaskResource::collection($tasks);
-        return view('task.index', compact('formattedTasks'));
+        return view('tasks', compact('tasks'));
     }
 
     public function renderTaskDetails($id)
     {
         $task = $this->taskService->find($id);
-        return view('task.show', compact('task'));
+        return view('tasks.show', compact('task'));
     }
 
     public function createTaskAndRedirect($data)
